@@ -29,7 +29,9 @@ jobs:
       - name: Install dependencies
         run: poetry install
       - name: Lint
-        run: poetry run ruff keyring_pybridge
+        run: |
+          poetry run ruff keyring_pybridge
+          poetry run black --check keyring_pybridge
 
   build:
     name: Build and test wheel
