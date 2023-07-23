@@ -24,18 +24,16 @@ def call_python_keyring(python, command):
 def check_python(python):
     py_self = Path(executable).resolve()
     py_bridge = Path(python).resolve()
-    if py_bridge.is_file() and py_self == py_bridge:
-        raise ValueError(
-            "please configure KEYRING_PROPERTY_PYTHON to a python"
-            f"executable other than {executable}"
-        )
-    py_bridge = Path(which(python)).resolve()
-    if py_bridge.is_file() and py_self == py_bridge:
+    if not py_bridge.is_file():
+        py_bridge = Path(which(python)).resolve()
+    if not py_bridge.is_file():
+        raise ValueError(f"{python} is not a file")
+    if py_self == py_bridge:
         raise ValueError(
             "please configure KEYRING_PROPERTY_PYTHON to a python"
             f" executable other than {executable}"
         )
-    raise ValueError(f"{python} does not exist")
+    # TODO: check if keyring can be imported
 
 
 def format_args(*args):
