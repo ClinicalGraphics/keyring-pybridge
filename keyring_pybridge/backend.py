@@ -33,7 +33,6 @@ def check_python(python):
             "please configure KEYRING_PROPERTY_PYTHON to a python"
             f" executable other than {executable}"
         )
-    # TODO: check if keyring can be imported
 
 
 def format_args(*args):
