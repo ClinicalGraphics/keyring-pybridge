@@ -33,6 +33,7 @@ def check_python(python):
             "please configure KEYRING_PROPERTY_PYTHON to a python"
             f" executable other than {executable}"
         )
+    call_python_keyring(python, "")
 
 
 def format_args(*args):
