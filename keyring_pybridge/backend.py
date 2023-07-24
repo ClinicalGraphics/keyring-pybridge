@@ -36,7 +36,7 @@ def check_python(python):
 
 
 def format_args(*args):
-    return ', '.join(map(repr, args))
+    return ", ".join(map(repr, args))
 
 
 class PyBridgeKeyring(KeyringBackend):
@@ -53,10 +53,12 @@ class PyBridgeKeyring(KeyringBackend):
     def get_password(self, servicename, username):
         check_python(self.python)
         args = format_args(servicename, username)
-        return json.loads(call_python_keyring(
-            self.python,
-            f"import json; print(json.dumps(keyring.get_password({args})))",
-        ))
+        return json.loads(
+            call_python_keyring(
+                self.python,
+                f"import json; print(json.dumps(keyring.get_password({args})))",
+            )
+        )
 
     def delete_password(self, servicename, username):
         check_python(self.python)
