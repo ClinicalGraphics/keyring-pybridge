@@ -14,13 +14,10 @@ Then set environment variables to use the backend:
 PYTHON_KEYRING_BACKEND=keyring_pybridge.PyBridgeKeyring
 ```
 
-Or use the programmatic API:
+Finally, you have to point the backend to the secondary python executable that you want to connect to. The keyring package must be installed in that python executable's environment.
 
-```py
-import keyring
-from keyring_pybridge import PyBridgeKeyring
-
-keyring.set_keyring(PyBridgeKeyring())
+```
+KEYRING_PROPERTY_PYTHON=/path/to/python
 ```
 
 ## WSL
@@ -34,3 +31,5 @@ Then, in WSL, configure the environment variable `KEYRING_PROPERTY_PYTHON` to po
 ```
 KEYRING_PROPERTY_PYTHON=C:\path\to\the\right\python.exe
 ```
+
+Since this library calls the windows binary via a subprocess, this facilitates the context switch to windows that allows keyring to communicate with the Windows Credential Manager. 🎉

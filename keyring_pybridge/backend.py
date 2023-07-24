@@ -1,4 +1,9 @@
+from functools import cache
+import json
+from pathlib import Path
+from shutil import which
 from subprocess import run
+from sys import executable
 
 from keyring.backend import KeyringBackend
 
@@ -15,22 +20,52 @@ def call_python_keyring(python, command):
     return stdout
 
 
+@cache
+def check_python(python):
+    if not python:
+        raise ValueError("please configure KEYRING_PROPERTY_PYTHON")
+    py_self = Path(executable).resolve()
+    py_bridge = Path(python).resolve()
+    if not py_bridge.is_file():
+        py_bridge = Path(which(python) or "").resolve()
+    if not py_bridge.is_file():
+        raise ValueError(f"{python} is not a file")
+    if py_self == py_bridge:
+        raise ValueError(
+            "please configure KEYRING_PROPERTY_PYTHON to a python"
+            f" executable other than {executable}"
+        )
+    call_python_keyring(python, "")
+
+
+def format_args(*args):
+    return ", ".join(map(repr, args))
+
+
 class PyBridgeKeyring(KeyringBackend):
     priority = 1
-    python = "python"
+    python = ""
 
     def set_password(self, servicename, username, password):
+        check_python(self.python)
         call_python_keyring(
             self.python,
-            f"keyring.set_password('{servicename}', '{username}', '{password}')",
+            f"keyring.set_password({format_args(servicename, username, password)})",
         )
 
     def get_password(self, servicename, username):
-        return call_python_keyring(
-            self.python, f"print(keyring.get_password('{servicename}', '{username}'))"
+        check_python(self.python)
+        args = format_args(servicename, username)
+        return json.loads(
+            call_python_keyring(
+                self.python,
+                f"import json; print(json.dumps(keyring.get_password({args})))",
+            )
         )
 
     def delete_password(self, servicename, username):
+        check_python(self.python)
         call_python_keyring(
-            self.python, f"keyring.delete_password('{servicename}', '{username}')"
+            self.python,
+            f"keyring.delete_password({format_args(servicename, username)})",
         )
