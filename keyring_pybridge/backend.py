@@ -22,10 +22,12 @@ def call_python_keyring(python, command):
 
 @cache
 def check_python(python):
+    if not python:
+        raise ValueError("please configure KEYRING_PROPERTY_PYTHON")
     py_self = Path(executable).resolve()
     py_bridge = Path(python).resolve()
     if not py_bridge.is_file():
-        py_bridge = Path(which(python)).resolve()
+        py_bridge = Path(which(python) or "").resolve()
     if not py_bridge.is_file():
         raise ValueError(f"{python} is not a file")
     if py_self == py_bridge:
@@ -42,7 +44,7 @@ def format_args(*args):
 
 class PyBridgeKeyring(KeyringBackend):
     priority = 1
-    python = "python"
+    python = ""
 
     def set_password(self, servicename, username, password):
         check_python(self.python)
