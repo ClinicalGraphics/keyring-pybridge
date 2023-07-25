@@ -2,22 +2,16 @@ from functools import cache
 import json
 from pathlib import Path
 from shutil import which
-from subprocess import run
+from subprocess import CalledProcessError, run
 from sys import executable
 
 from keyring.backend import KeyringBackend
+from keyring.errors import *  # noqa: F403
 
 
-def call_python_keyring(python, command):
-    p = run(
-        [python, "-c", f"import keyring; {command}"], shell=False, capture_output=True
-    )
-    stdout, stderr = p.stdout.decode("utf-8").strip(), p.stderr.decode("utf-8").strip()
-    if p.returncode != 0:
-        raise RuntimeError(
-            f"call to WSL host keyring failed (python path: {python}): {stderr}"
-        )
-    return stdout
+def run_command(command, encoding="utf-8"):
+    p = run(command, shell=False, capture_output=True, check=True)
+    return p.stdout.decode(encoding).strip()
 
 
 @cache
@@ -35,7 +29,36 @@ def check_python(python):
             "please configure KEYRING_PROPERTY_PYTHON to a python"
             f" executable other than {executable}"
         )
-    call_python_keyring(python, "")
+    run_command([python, "-c", "print('check')"])
+
+
+@cache
+def get_encoding(python):
+    return run_command([python, "-c", "import sys; print(sys.stdout.encoding)"])
+
+
+def call_keyring(python, command):
+    check_python(python)
+    encoding = get_encoding(python)
+    code = """import keyring
+import sys
+try:
+    {command}
+except keyring.errors.KeyringError as err:
+    print(repr(err), file=sys.stderr)
+    sys.exit(100)
+""".format(
+        command=command
+    )
+    try:
+        return run_command([python, "-c", code], encoding=encoding)
+    except CalledProcessError as err:
+        if err.returncode == 100:
+            stderr = err.stderr.decode(encoding).strip()
+            exc = eval(stderr)
+            raise exc
+        else:
+            raise
 
 
 def format_args(*args):
@@ -47,25 +70,26 @@ class PyBridgeKeyring(KeyringBackend):
     python = ""
 
     def set_password(self, servicename, username, password):
-        check_python(self.python)
-        call_python_keyring(
+        call_keyring(
             self.python,
             f"keyring.set_password({format_args(servicename, username, password)})",
         )
 
     def get_password(self, servicename, username):
-        check_python(self.python)
         args = format_args(servicename, username)
         return json.loads(
-            call_python_keyring(
+            call_keyring(
                 self.python,
-                f"import json; print(json.dumps(keyring.get_password({args})))",
+                (
+                    f"import json; print("
+                    f"json.dumps(keyring.get_password({args}), ensure_ascii=False)"
+                    f")"
+                ),
             )
         )
 
     def delete_password(self, servicename, username):
-        check_python(self.python)
-        call_python_keyring(
+        call_keyring(
             self.python,
             f"keyring.delete_password({format_args(servicename, username)})",
         )
