@@ -23,6 +23,7 @@ keyring-pybridge relies on the existence of a python environment on Windows that
 # if you're using cmd instead of powershell, substitute %USERPROFILE% for $env:USERPROFILE
 mkdir $env:USERPROFILE\.keyring-pybridge
 cd $env:USERPROFILE\.keyring-pybridge
+# if the py command is not available on your system, substitute for python
 py -3 -m venv .
 Scripts\pip install keyring
 echo $env:USERPROFILE\.keyring-pybridge\Scripts\python.exe
