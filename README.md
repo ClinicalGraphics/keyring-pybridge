@@ -51,22 +51,26 @@ Of course, if you used a different location for the virtual environment, substit
 
 The rest of the installation process is performed in your shell of choice in WSL.
 
-Set the following environment variables in your `~/.bashrc` or whatever shell profile file you prefer.
+Set the following environment variables in your `~/.bashrc` or whatever shell profile file you prefer. 
+
+> **Note**
+> You have to populate the second variable with **your path to python.exe**, which you created in step 1.
+>
+> You can't just paste the path to `python.exe` directly. You have to **convert it to a path that resolves to the same location in WSL**. I'll show you my path so you can see how the conversion works and apply the same conversion to your path:
+> 
+> * Windows: `C:\Users\kvang\.keyring-pybridge\Scripts\python.exe`
+> * WSL: `/mnt/c/Users/kvang/.keyring-pybridge/Scripts/python.exe`
+
+So for my personal setup, I added the following two lines to the end of my `~/.bashrc` file:
 
 ```sh
 export PYTHON_KEYRING_BACKEND="keyring_pybridge.PyBridgeKeyring"
 export KEYRING_PROPERTY_PYTHON="/mnt/c/Users/kvang/.keyring-pybridge/Scripts/python.exe"
 ```
 
-> **Note**
-> You can't just paste the path to `python.exe` directly. You have to convert it to a path that resolves to the same location in WSL. I'll show you my path so you can see how the conversion works and apply the same conversion to your path:
-> 
-> * Windows: `C:\Users\kvang\.keyring-pybridge\Scripts\python.exe`
-> * WSL: `/mnt/c/Users/kvang/.keyring-pybridge/Scripts/python.exe`
-
 You have to reload your profile (`source ~/.bashrc` for bash) or you can just launch a new shell for the changes to take effect.
 
-Run the following command in your shell to check the variables are configured correctly:
+Run the following two commands in your shell to check the variables are configured correctly. The output should match what is shown here.
 
 ```shell
 $ $KEYRING_PROPERTY_PYTHON -c 'import keyring; print("✅")'
@@ -77,7 +81,7 @@ keyring_pybridge.PyBridgeKeyring
 
 ### Step 3: WSL keyring-pybridge installation
 
-We're almost there!
+We're almost there! 💪
 
 Finally, you have to `pip install keyring-pybridge` into **each python environment in WSL that uses keyring**. Of course you can use alternative package managers, such as poetry, to install as well.
 
@@ -85,15 +89,17 @@ Examples of tools which use keyring are [poetry](https://python-poetry.org/) and
 
 #### Example: poetry installation
 
-Assuming you've installed poetry using the official installer, the following commands should do it:
-
 ```sh
 poetryBinDir=$(dirname $(readlink -f $(which poetry)))
 $poetryBinDir/pip install keyring-pybridge
 ```
+
+Now you can use Poetry's built-in credential management commands in WSL with Windows Credential Manager! 🙌
 
 #### Example: keycmd installation
 
 Assuming you've installed keycmd globally, just `pip install keyring-pybridge` should be sufficient.
 
 If you're using pyenv, you should first `pyenv activate keycmd`, before running `pip`. Don't forget to `pyenv deactivate` when you're done.
+
+Now you can use keycmd in WSL with Windows Credential Manager! 🏎️
