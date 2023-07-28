@@ -90,6 +90,9 @@ Examples of tools which use keyring are [poetry](https://python-poetry.org/) and
 
 #### Example: poetry installation
 
+> **Note**
+> This assumes you've already [installed poetry](https://python-poetry.org/docs/#installation).
+
 ```sh
 poetryBinDir=$(dirname $(readlink -f $(which poetry)))
 $poetryBinDir/pip install keyring-pybridge
@@ -99,10 +102,12 @@ Now you can use Poetry's built-in credential management commands in WSL with Win
 
 #### Example: keycmd installation
 
-If you've followed the [pyenv installation instructions for keycmd](https://github.com/ClinicalGraphics/keycmd#pyenv-installation), you should start by activating the virtual environment where you installed keycmd. If you followed the instructions to the letter, `pyenv activate keycmd` should be the right command. If you don't use pyenv, you can skip this step.
+> **Note**
+> This assumes you've already [installed keycmd](https://github.com/ClinicalGraphics/keycmd#installation).
 
-The next step is `pip install keyring-pybridge`.
-
-Don't forget to `pyenv deactivate` when you're done.  If you don't use pyenv, you can skip this step.
+```sh
+keycmdBinDir=$(dirname $(readlink -f $(which keycmd)))
+$keycmdBinDir/pip install keyring-pybridge
+```
 
 Now you can use keycmd in WSL with Windows Credential Manager! 🏎️
