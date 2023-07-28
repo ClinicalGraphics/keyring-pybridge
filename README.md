@@ -99,8 +99,10 @@ Now you can use Poetry's built-in credential management commands in WSL with Win
 
 #### Example: keycmd installation
 
-If you're using pyenv, you should first `pyenv activate keycmd`, before running the next command. Don't forget to `pyenv deactivate` when you're done.
+If you've followed the (pyenv installation instructions for keycmd](https://github.com/ClinicalGraphics/keycmd#pyenv-installation), you should start by activating the virtual environment where you installed keycmd. If you followed the instructions to the letter, `pyenv activate keycmd` should be the right command. If you don't use pyenv, you can skip this step.
 
-Assuming you've installed keycmd globally, just `pip install keyring-pybridge` should be sufficient.
+The next step is `pip install keyring-pybridge`.
+
+Don't forget to `pyenv deactivate` when you're done.  If you don't use pyenv, you can skip this step.
 
 Now you can use keycmd in WSL with Windows Credential Manager! 🏎️
